@@ -2,10 +2,12 @@ module jira-go-bot
 
 go 1.21
 
-require gopkg.in/telebot.v3 v3.2.1
+require (
+	github.com/andygrunwald/go-jira v1.16.0
+	gopkg.in/telebot.v3 v3.2.1
+)
 
 require (
-	github.com/andygrunwald/go-jira v1.16.0 // indirect
 	github.com/fatih/structs v1.1.0 // indirect
 	github.com/golang-jwt/jwt/v4 v4.4.2 // indirect
 	github.com/golang/snappy v0.0.3 // indirect
