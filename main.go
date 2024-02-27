@@ -31,9 +31,14 @@ func UserRegistration(b *tele.Bot) {
 	codeInput := tbcomctl.NewInputText("code", "Пожалуйста, введите код отправленный вам на mail.yandex.ru", processInput(b))
 	form := tbcomctl.NewForm(codeInput)
 
-	b.Handle("/jira_acc", form.Handler)
 	str := randomizer()
-	Sender.SendMessage(str)
+
+	b.Handle("/jira_acc", func(c tele.Context) error {
+		Sender.SendMessage(str)
+		return nil
+	})
+
+	b.Handle("/jira", form.Handler)
 
 	b.Handle(tele.OnText, func(c tele.Context) error {
 		if c.Message().IsReply() {
@@ -59,6 +64,7 @@ func main() {
 	}
 
 	UserRegistration(b)
+	//Sender.SendMessage("Hello")
 	//
 	b.Handle("/start", func(m tele.Context) error {
 		m.Send("Привет!\nЯ Джира-Бот, призван помочь твоей работе внутри Devim!\nЯ буду присылать тебе задачки из Jira прямо в телеграмм.")
