@@ -6,16 +6,16 @@ import (
 	"log"
 )
 
-func UserMailReturner(client *jira.Client, username string) string {
+func UserMailReturner(client *jira.Client, username string) jira.User {
 	users, _, err := client.User.Find(username, jira.WithUsername(username))
 	if err != nil {
 		fmt.Println(err)
 	}
-	var mail string
+	var user1 jira.User
 	for _, user := range users {
-		mail = user.EmailAddress
+		user1 = user
 	}
-	return mail
+	return user1
 }
 
 func JiraClient() *jira.Client {
