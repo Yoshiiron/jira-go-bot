@@ -5,7 +5,7 @@ import (
 	"net/smtp"
 )
 
-func SendMessage(text string) {
+func SendMessage(text string, toMail string) {
 
 	smtpHost := "smtp.yandex.ru"
 	smtpPort := "587"
@@ -14,7 +14,7 @@ func SendMessage(text string) {
 
 	from := "yoshiiron@yandex.ru"
 
-	to := []string{"denis.astafev@devim.team"}
+	to := []string{toMail}
 	message := []byte("Subject: Тестовое сообщение\r\n" +
 		"From: " + from + "\r\n" +
 		"\r\n" +
