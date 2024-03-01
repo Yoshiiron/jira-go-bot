@@ -16,7 +16,7 @@ import (
 	"gopkg.in/telebot.v3/middleware"
 )
 
-const SuperuserId tele.ChatID = 435902334 // Set your tg id
+const SuperuserId tele.ChatID = 986576715 // Set your tg id
 
 var (
 	InputSG           = fsm.NewStateGroup("reg")
