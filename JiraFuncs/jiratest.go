@@ -6,7 +6,7 @@ import (
 	"log"
 )
 
-func UserMailReturner(client *jira.Client, username string) jira.User {
+func UserReturner(client *jira.Client, username string) jira.User {
 	users, _, err := client.User.Find(username, jira.WithUsername(username))
 	if err != nil {
 		fmt.Println(err)
