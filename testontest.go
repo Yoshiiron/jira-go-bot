@@ -1,9 +1,11 @@
 package main
 
 import (
+	"encoding/json"
 	"flag"
 	"fmt"
 	"github.com/nats-io/nats.go"
+	"github.com/syndtr/goleveldb/leveldb"
 	"github.com/thanhpk/randstr"
 	"github.com/vitaliy-ukiru/fsm-telebot"
 	"github.com/vitaliy-ukiru/fsm-telebot/storages/memory"
@@ -12,6 +14,7 @@ import (
 	jiraFuncs "jira-go-bot/JiraFuncs"
 	"jira-go-bot/Sender"
 	"log"
+	"strconv"
 	"time"
 )
 
@@ -19,6 +22,7 @@ var (
 	JiraAccountInput = fsm.NewStateGroup("accountinput")
 	SendedCode       = JiraAccountInput.New("code")
 	InputedCode      = JiraAccountInput.New("incode")
+	JiraLogin        = JiraAccountInput.New("login")
 )
 
 var debug = flag.Bool("debug", false, "log debug info")
@@ -27,6 +31,11 @@ var (
 	ActivationBtn = tele.Btn{Text: "Активация"}
 	returnBtn     = tele.Btn{Text: "Вернуться назад"}
 )
+
+type RecievedMessageFromHooks struct {
+	To      string `json:"to"`
+	Message string `json:"message"`
+}
 
 func main() {
 	flag.Parse()
@@ -67,10 +76,27 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
 	defer nc.Close()
+
 	nc.Subscribe("foo", func(m *nats.Msg) {
-		fmt.Printf("Received a message: %s\n", string(m.Data))
-		bot.Send(tele.ChatID(435902334), jiraFuncs.UserReturner(jiraFuncs.JiraClient(), fmt.Sprintf("%v", string(m.Data))).Key)
+		var hooksmessage RecievedMessageFromHooks
+		//hooksmessage = json.Unmarshal(m.Data)
+		//fmt.Printf("Received a message: %s\n", string(m.Data))
+
+		json.Unmarshal(m.Data, &hooksmessage)
+
+		//fmt.Printf("Получено следующее сообщение: \nКому: %v\nСообщение: %v", hooksmessage.To, hooksmessage.Message)
+
+		db, _ := leveldb.OpenFile(".\\DB", nil)
+		jirakey, _ := db.Get([]byte(hooksmessage.To), nil)
+		key, _ := strconv.Atoi(string(jirakey))
+		db.Close()
+		bot.Send(tele.ChatID(key), hooksmessage.Message)
+		//fmt.Println(int64(jirakey1))
+		//bot.Send(tele.ChatID(int64(jirakey1)), "Успешно.")
+
+		//bot.Send(tele.ChatID(resultChan), "Успешно.")
 	})
 
 	// buttons
@@ -98,6 +124,15 @@ func OnStart(start tele.Btn) tele.HandlerFunc {
 	}
 }
 
+func dbconn() *leveldb.DB {
+	db, err := leveldb.OpenFile(".\\DB", nil)
+	if err != nil {
+		log.Println(err)
+	}
+	db.Close()
+	return db
+}
+
 func OnActivation(c tele.Context, state fsm.Context) error {
 	menu := &tele.ReplyMarkup{}
 	menu.Reply(menu.Row(returnBtn))
@@ -113,6 +148,7 @@ func OnInputJiraLogin(c tele.Context, state fsm.Context) error {
 	code := randstr.String(6)
 	Sender.SendMessage(code, jirauser.EmailAddress)
 
+	go state.Update("login", Login)
 	go state.Update("code", code)
 	go state.Set(InputedCode)
 
@@ -128,10 +164,16 @@ func OnInputCode(c tele.Context, state fsm.Context) error {
 	var (
 		sendedCode  string
 		inputedCode string
+		login       string
 	)
 	state.MustGet("code", &sendedCode)
+	state.MustGet("login", &login)
 	inputedCode = c.Message().Text
 
+	jirauser := jiraFuncs.UserReturner(jiraFuncs.JiraClient(), login)
+	db, _ := leveldb.OpenFile(".\\DB", nil)
+	db.Put([]byte(jirauser.Key), []byte(fmt.Sprintf("%v", c.Chat().ID)), nil)
+	db.Close()
 	fmt.Println(sendedCode, inputedCode)
 
 	result := "Произошла ошибка при регистрации. Проверьте правильность введённого вами кода."

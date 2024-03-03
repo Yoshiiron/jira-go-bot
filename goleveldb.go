@@ -12,8 +12,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	err = db.Put([]byte("jirakey"), []byte("11111111"), nil)
-	//err = db.Put([]byte("jirakey"), []byte("11111111"), nil)
+	//err = db.Put([]byte("JIRAUSER15800"), []byte("435902334"), nil)
 
 	iter := db.NewIterator(nil, nil)
 	for iter.Next() {
@@ -25,6 +24,13 @@ func main() {
 	}
 	iter.Release()
 	err = iter.Error()
+	//value, err := db.Get([]byte("JIRAUSER15800"), nil)
+	//if err != nil {
+	//	fmt.Println(err)
+	//}
 
+	//db.Delete([]byte("JIRAUSER15800"), nil)
+
+	//fmt.Println(string(value))
 	defer db.Close()
 }
