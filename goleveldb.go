@@ -20,6 +20,7 @@ func main() {
 		// only valid until the next call to Next.
 		key := iter.Key()
 		value := iter.Value()
+		db.Delete([]byte(iter.Key()), nil)
 		fmt.Printf("key: %s, value: %s\n", key, value)
 	}
 	iter.Release()
