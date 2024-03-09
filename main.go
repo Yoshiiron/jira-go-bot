@@ -143,16 +143,28 @@ func OnActivation(c tele.Context, state fsm.Context) error {
 }
 
 func OnInputJiraLogin(c tele.Context, state fsm.Context) error {
+	menu := &tele.ReplyMarkup{}
+	menu.Reply(menu.Row(ActivationBtn))
+	menu.ResizeKeyboard = true
+
 	Login := c.Message().Text
-	jirauser := jiraFuncs.UserReturner(jiraFuncs.JiraClient(), Login)
-	code := randstr.String(6)
-	Sender.SendMessage(code, jirauser.EmailAddress)
+	jirauser := jiraFuncs.UserReturner(Login)
 
-	go state.Update("login", Login)
-	go state.Update("code", code)
-	go state.Set(InputedCode)
+	//defer state.Finish(true)
+	result := "Произошла ошибка при регистрации. Пользователь не найден. Проверьте правильность введённого вами логина."
 
-	return c.Send(fmt.Sprintf("На вашу почту %v был направлен код, введите его.", jirauser.EmailAddress))
+	if jirauser.Name != "" {
+
+		code := randstr.String(6)
+		Sender.SendMessage(code, jirauser.EmailAddress)
+
+		go state.Update("login", Login)
+		go state.Update("code", code)
+		go state.Set(InputedCode)
+
+		return c.Send(fmt.Sprintf("На вашу почту %v был направлен код, введите его.", jirauser.EmailAddress))
+	}
+	return c.Send(fmt.Sprintf(result), menu)
 }
 
 func OnInputCode(c tele.Context, state fsm.Context) error {
@@ -170,7 +182,8 @@ func OnInputCode(c tele.Context, state fsm.Context) error {
 	state.MustGet("login", &login)
 	inputedCode = c.Message().Text
 
-	jirauser := jiraFuncs.UserReturner(jiraFuncs.JiraClient(), login)
+	fmt.Println(sendedCode, inputedCode)
+	jirauser := jiraFuncs.UserReturner(login)
 	db, _ := leveldb.OpenFile(".\\DB", nil)
 	db.Put([]byte(jirauser.Key), []byte(fmt.Sprintf("%v", c.Chat().ID)), nil)
 	db.Close()
