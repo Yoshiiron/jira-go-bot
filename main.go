@@ -72,7 +72,7 @@ func main() {
 		return c.Send(s.GoString())
 	})
 
-	nc, err := nats.Connect("nats://192.168.1.121:4222")
+	nc, err := nats.Connect("nats://nats:4222")
 	if err != nil {
 		log.Fatal(err)
 	}
