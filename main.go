@@ -88,7 +88,7 @@ func main() {
 
 		fmt.Printf("Получено следующее сообщение: \nКому: %v\nСообщение: %v", hooksmessage.To, hooksmessage.Message)
 
-		db, _ := leveldb.OpenFile(".\\DB", nil)
+		db, _ := leveldb.OpenFile("/DB", nil)
 		jirakey, _ := db.Get([]byte(hooksmessage.To), nil)
 		key, _ := strconv.Atoi(string(jirakey))
 		db.Close()
@@ -125,7 +125,7 @@ func OnStart(start tele.Btn) tele.HandlerFunc {
 }
 
 func dbconn() *leveldb.DB {
-	db, err := leveldb.OpenFile(".\\DB", nil)
+	db, err := leveldb.OpenFile("/DB", nil)
 	if err != nil {
 		log.Println(err)
 	}
@@ -184,7 +184,7 @@ func OnInputCode(c tele.Context, state fsm.Context) error {
 
 	fmt.Println(sendedCode, inputedCode)
 	jirauser := jiraFuncs.UserReturner(login)
-	db, _ := leveldb.OpenFile(".\\DB", nil)
+	db, _ := leveldb.OpenFile("/DB", nil)
 	db.Put([]byte(jirauser.Key), []byte(fmt.Sprintf("%v", c.Chat().ID)), nil)
 	db.Close()
 	fmt.Println(sendedCode, inputedCode)
