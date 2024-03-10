@@ -86,7 +86,7 @@ func main() {
 
 		json.Unmarshal(m.Data, &hooksmessage)
 
-		//fmt.Printf("Получено следующее сообщение: \nКому: %v\nСообщение: %v", hooksmessage.To, hooksmessage.Message)
+		fmt.Printf("Получено следующее сообщение: \nКому: %v\nСообщение: %v", hooksmessage.To, hooksmessage.Message)
 
 		db, _ := leveldb.OpenFile(".\\DB", nil)
 		jirakey, _ := db.Get([]byte(hooksmessage.To), nil)
