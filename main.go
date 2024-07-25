@@ -81,8 +81,6 @@ func main() {
 
 	nc.Subscribe("foo", func(m *nats.Msg) {
 		var hooksmessage RecievedMessageFromHooks
-		//hooksmessage = json.Unmarshal(m.Data)
-		//fmt.Printf("Received a message: %s\n", string(m.Data))
 
 		json.Unmarshal(m.Data, &hooksmessage)
 
@@ -93,10 +91,6 @@ func main() {
 		key, _ := strconv.Atoi(string(jirakey))
 		db.Close()
 		bot.Send(tele.ChatID(key), hooksmessage.Message)
-		//fmt.Println(int64(jirakey1))
-		//bot.Send(tele.ChatID(int64(jirakey1)), "Успешно.")
-
-		//bot.Send(tele.ChatID(resultChan), "Успешно.")
 	})
 
 	// buttons
@@ -119,7 +113,7 @@ func OnStart(start tele.Btn) tele.HandlerFunc {
 		log.Println("new user", c.Sender().ID)
 		return c.Send(
 			"Привет!"+
-				"\nЯ Джира-Бот, призван помочь твоей работе внутри Devim!"+
+				"\nЯ Джира-Бот."+
 				"\nЯ буду присылать тебе задачки из Jira прямо в телеграмм.", menu)
 	}
 }

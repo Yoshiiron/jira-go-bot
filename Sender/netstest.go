@@ -9,16 +9,16 @@ func SendMessage(text string, toMail string) {
 
 	smtpHost := "smtp.yandex.ru"
 	smtpPort := "587"
-	smtpUsername := "yoshiiron@yandex.ru"
-	smtpPassword := "udzkrlwvxgeyfptz"
+	smtpUsername := "---"
+	smtpPassword := "---"
 
-	from := "yoshiiron@yandex.ru"
+	from := "---"
 
 	to := []string{toMail}
 	message := []byte("Subject: Тестовое сообщение\r\n" +
 		"From: " + from + "\r\n" +
 		"\r\n" +
-		"Ваш код для активации Jira-Devim-Bot: " + text + "\r\n")
+		"Ваш код для активации Jira-Bot: " + text + "\r\n")
 
 	auth := smtp.PlainAuth("", smtpUsername, smtpPassword, smtpHost)
 

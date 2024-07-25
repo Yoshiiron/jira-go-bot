@@ -21,9 +21,9 @@ func UserReturner(username string) jira.User {
 
 func JiraClient() *jira.Client {
 	tp := jira.PATAuthTransport{
-		Token: "MjQ3NDcxMjQ2MDE2OrGi1v39Ob9i9T58zhBIFYO0Lx3E",
+		Token: "---",
 	}
-	jiraClient, err := jira.NewClient(tp.Client(), "https://jira.yoshiiron.space")
+	jiraClient, err := jira.NewClient(tp.Client(), "---")
 	if err != nil {
 		log.Fatalf("Failed to create JIRA client: %s", err)
 	}
